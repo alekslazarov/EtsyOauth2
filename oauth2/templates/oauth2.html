@@ -1,0 +1,61 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <title>Etsy Oauth2.0</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Rubik:300,400,700|Oswald:400,700" rel="stylesheet">
+    <style>
+        body {
+            background: #eee;
+        }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .title {
+            margin-left: 10px;
+        }
+        .grant-container {
+            margin-top: 30px;
+            width: 80%;
+            margin-left: 10%;
+        }
+        .api-container {
+            margin-top: 30px;
+            width: 80%;
+            margin-left: 10%;
+        }
+        .step {
+            font-size: 20px;
+        }
+        .button {
+            width: 120px;
+            height: 40px;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="header-container">
+        <img src="{% static "oauth2/assets/etsy-logo.png" %}" width="50" />
+        <h1 class="title">Etsy Oauth2.0</h1>
+    </div>
+    <div class="grant-container">
+        <div class="step">
+            <p><b>Step 1.</b> &nbsp; Click the "Grant Access" button. This will redirect you to the Etsy authentication page where you input your Etsy credentials. <br>
+                After the authentication is success, you will be redirected to this page again and your tokens (access & refresh) will be input.
+            </p>
+            <button class="button" onclick="on_grant_access();">Grant Access</button>
+        </div>
+    </div>
+    <div class="api-container"></div>
+
+    <script type="text/javascript">
+        function on_grant_access() {
+
+        }
+    </script>
+
+  </body>
