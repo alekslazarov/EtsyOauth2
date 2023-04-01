@@ -6,6 +6,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://fonts.googleapis.com/css?family=Rubik:300,400,700|Oswald:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <style>
         body {
             background: #eee;
@@ -30,13 +32,56 @@
         }
         .step {
             font-size: 20px;
+            margin-top: 20px;
+        }
+        .step-title {
+            font-size: 28px;
         }
         .button {
-            width: 120px;
+            width: 150px;
             height: 40px;
         }
         .btn-grant-access {
             margin-top: 15px;
+        }
+        .tokens-container {
+            margin-top: 10px;
+        }
+        .tokens {
+            display: flex;
+        }
+        .token {
+            width: 300px;
+            height: 100px;
+        }
+        .token-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .refresh-token {
+            margin-left: 10px;
+        }
+        .api-request {
+            font-size: 20px;
+        }
+        #api_url {
+            margin-top: 10px;
+            width: 300px;
+        }
+        #api_payload {
+            margin-top: 10px;
+            width: 300px;
+            height: 200px;
+        }
+        #btn_call_api {
+            margin-top: 10px;
+        }
+        .api-response {
+            margin-top: 20px;
+        }
+        #api_response {
+            width: 600px;
+            height: 400px;
         }
     </style>
   </head>
@@ -47,7 +92,7 @@
     </div>
     <div class="grant-container">
         <div class="step">
-            <p><b>Step 1.</b> &nbsp; Select the scopes you need to be granted and click the "Grant Access" button. This will redirect you to the Etsy authentication page where you input your Etsy credentials. <br>
+            <p><b class="step-title">Step 1.</b> &nbsp; Select the scopes you need to be granted and click the "Grant Access" button. This will redirect you to the Etsy authentication page where you input your Etsy credentials. <br>
                 After the authentication is success, you will be redirected to this page again and your tokens (access & refresh) will be input.
             </p>
             <div class="scopes">
@@ -133,7 +178,43 @@
                     <label for="scope_transactions_w"><b>transactions_w: </b> Update a member's sales data.</label>
                 </div>
             </div>
-            <button class="button btn-grant-access" onclick="on_grant_access();">Grant Access</button>
+            <button class="button btn-grant-access btn-info" onclick="on_grant_access();">Grant Access</button>
+            <div class="tokens-container">
+                <b>Tokens</b>
+                <div class="tokens">
+                    <div class="access-token">
+                        <p class="token-name">Access Token</p>
+                        <textarea id="access_token" class="token" readonly>{{ access_token }}</textarea>
+                    </div>
+                    <div class="refresh-token">
+                        <p class="token-name">Refresh Token</p>
+                        <textarea id="refresh_token" class="token" readonly>{{ refresh_token }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="step">
+            <p><b class="step-title">Step 2.</b>&nbsp; Select Etsy api request method, input api url and its payload (in json format).
+                Click the "Call API" button. This will use the above "Access Token" to call the Etsy api. <br>
+                Make sure to call the Etsy api which you requested permission by selecting the scopes above when you click the "Grant Access" button.
+            </p>
+            <div class="api-request">
+                <div>
+                    <select id="api_method">
+                        <option value="get">GET</option>
+                        <option value="post">POST</option>
+                        <option value="put">PUT</option>
+                        <option value="delete">DELETE</option>
+                    </select>
+                    <input id="api_url" class="form-control" placeholder="Etsy api url" />
+                    <textarea id="api_payload" class="form-control" placeholder="Etsy API request payload"></textarea>
+                    <button id="btn_call_api" class="button btn-info" onclick="on_call_api();">Call API</button>
+                </div>
+            </div>
+            <div class="api-response">
+                <div><b>API Response</b></div>
+                <textarea id="api_response" placeholder="Etsy API Response"></textarea>
+            </div>
         </div>
     </div>
     <div class="api-container"></div>
@@ -144,6 +225,12 @@
         crossorigin="anonymous">
     </script>
     <script type="text/javascript">
+        $(document).ready(function() {
+           let error = "{{ error | safe }}";
+           if (error.length > 0)
+               alert(error);
+        });
+
         function on_grant_access() {
             let scopes = [];
             $('.scope input:checked').each(function() {
@@ -171,6 +258,21 @@
                 }
             });
         }
-    </script>
 
+        function on_call_api() {
+            let access_token = $("#access_token").val();
+            if (access_token.length === 0) {
+                alert("Please do grant access first to get the Etsy access token");
+                return;
+            }
+            let method = $("#api_method").val();
+            let url = $("#api_url").val();
+            let payload = $("#api_payload").val();
+
+            if (url.length === 0) {
+                alert("Please input the Etsy api url");
+                return;
+            }
+        }
+    </script>
   </body>
