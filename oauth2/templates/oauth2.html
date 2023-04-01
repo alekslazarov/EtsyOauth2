@@ -35,6 +35,9 @@
             width: 120px;
             height: 40px;
         }
+        .btn-grant-access {
+            margin-top: 15px;
+        }
     </style>
   </head>
   <body>
@@ -44,17 +47,129 @@
     </div>
     <div class="grant-container">
         <div class="step">
-            <p><b>Step 1.</b> &nbsp; Click the "Grant Access" button. This will redirect you to the Etsy authentication page where you input your Etsy credentials. <br>
+            <p><b>Step 1.</b> &nbsp; Select the scopes you need to be granted and click the "Grant Access" button. This will redirect you to the Etsy authentication page where you input your Etsy credentials. <br>
                 After the authentication is success, you will be redirected to this page again and your tokens (access & refresh) will be input.
             </p>
-            <button class="button" onclick="on_grant_access();">Grant Access</button>
+            <div class="scopes">
+                <b>Scopes</b>
+                <div class="scope">
+                    <input id="scope_address_r" type="checkbox" value="address_r" />
+                    <label for="scope_address_r"><b>address_r: </b> Read a member's shipping addresses.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_address_w" type="checkbox" value="address_w" />
+                    <label for="scope_address_w"><b>address_w: </b> Update and delete a member's shipping address.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_billing_r" type="checkbox" value="billing_r" />
+                    <label for="scope_billing_r"><b>billing_r: </b> Read a member's Etsy bill charges and payments.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_cart_r" type="checkbox" value="cart_r" />
+                    <label for="scope_cart_r"><b>cart_r: </b> Read the contents of a member’s cart.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_cart_w" type="checkbox" value="cart_w" />
+                    <label for="scope_cart_w"><b>cart_w: </b> Add and remove listings from a member's cart.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_email_r" type="checkbox" value="email_r" />
+                    <label for="scope_email_r"><b>email_r: </b> Read a member's email address.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_favorites_r" type="checkbox" value="favorites_r" />
+                    <label for="scope_favorites_r"><b>favorites_r: </b> View a member's favorite listings and users.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_favorites_w" type="checkbox" value="favorites_w" />
+                    <label for="scope_favorites_w"><b>favorites_w: </b> Add to and remove from a member's favorite listings and users.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_feedback_r" type="checkbox" value="feedback_r" />
+                    <label for="scope_feedback_r"><b>feedback_r: </b> View all details of a member's feedback (including purchase history.)</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_listings_d" type="checkbox" value="listings_d" />
+                    <label for="scope_listings_d"><b>listings_d: </b> Delete a member's listings.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_listings_r" type="checkbox" value="listings_r" />
+                    <label for="scope_listings_r"><b>listings_r: </b> Read a member's inactive and expired (i.e., non-public) listings.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_listings_w" type="checkbox" value="listings_w" />
+                    <label for="scope_listings_w"><b>listings_w: </b> Create and edit a member's listings.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_profile_r" type="checkbox" value="profile_r" />
+                    <label for="scope_profile_r"><b>profile_r: </b> Read a member's private profile information.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_profile_w" type="checkbox" value="profile_w" />
+                    <label for="scope_profile_w"><b>profile_w: </b> Update a member's private profile information.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_recommend_r" type="checkbox" value="recommend_r" />
+                    <label for="scope_recommend_r"><b>recommend_r: </b> View a member's recommended listings.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_recommend_w" type="checkbox" value="recommend_w" />
+                    <label for="scope_recommend_w"><b>recommend_w: </b> Remove a member's recommended listings.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_shops_r" type="checkbox" value="shops_r" />
+                    <label for="scope_shops_r"><b>shops_r: </b> See a member's shop description, messages and sections, even if not (yet) public.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_shops_w" type="checkbox" value="shops_w" />
+                    <label for="scope_shops_w"><b>shops_w: </b> Update a member's shop description, messages and sections.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_transactions_r" type="checkbox" value="transactions_r" />
+                    <label for="scope_transactions_r"><b>transactions_r: </b> Read a member's purchase and sales data. This applies to buyers as well as sellers.</label>
+                </div>
+                <div class="scope">
+                    <input id="scope_transactions_w" type="checkbox" value="transactions_w" />
+                    <label for="scope_transactions_w"><b>transactions_w: </b> Update a member's sales data.</label>
+                </div>
+            </div>
+            <button class="button btn-grant-access" onclick="on_grant_access();">Grant Access</button>
         </div>
     </div>
     <div class="api-container"></div>
 
+    <script
+        src="https://code.jquery.com/jquery-3.6.4.min.js"
+        integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
+        crossorigin="anonymous">
+    </script>
     <script type="text/javascript">
         function on_grant_access() {
+            let scopes = [];
+            $('.scope input:checked').each(function() {
+                scopes.push($(this).val());
+            });
 
+            if (scopes.length === 0) {
+                alert("At least one scope should be selected");
+                return;
+            }
+
+            $.ajax({
+                headers: { "X-CSRFToken": "{{ csrf_token }}"},
+                url: "{% url 'oauth2-auth-url' %}",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    "scopes": scopes
+                }),
+                success: function(res) {
+                    window.location.href = res;
+                },
+                error: function() {
+                    alert("Failed to get Etsy authorization url");
+                }
+            });
         }
     </script>
 

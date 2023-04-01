@@ -31,7 +31,9 @@ DJ_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    'rest_framework'
+]
 SELF_APPS = [
     'oauth2',
 ]
@@ -127,5 +129,8 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Etsy
-ETSY_API_KEY=env('ETSY_API_KEY', default='change-me')
-ETSY_API_SECRET=env('ETSY_API_SECRET', default='change-me')
+ETSY_API_KEY = env('ETSY_API_KEY', default='change-me')
+ETSY_API_SECRET = env('ETSY_API_SECRET', default='change-me')
+
+# Base URL
+BASE_URL = env('BASE_URL', default='change-me')
