@@ -1,3 +1,4 @@
+import hashlib
 import requests
 from django.conf import settings
 from django.shortcuts import redirect
@@ -26,7 +27,7 @@ class EtsyOauth2API(ViewSet):
                      f'redirect_uri={redirect_uri}&' \
                      f'scope={" ".join(scopes)}&' \
                      f'state={settings.ETSY_STATE}&' \
-                     f'code_challenge={settings.ETSY_PKCE}&' \
+                     f'code_challenge={hashlib.sha256(settings.ETSY_PKCE.encode()).hexdigest()}&' \
                      f'code_challenge_method=S256'
 
         return Response(oauth2_url, status=status.HTTP_200_OK)
@@ -55,8 +56,7 @@ class EtsyOauth2API(ViewSet):
                 error_description = resp.json()["error_description"]
             except:
                 error_description = 'Unknown Error'
-            error = f'Failed to get Etsy tokens. Status code {resp.status_code}. Description: {error_description}. ' \
-                    f'One time code was {code}'
+            error = f'Failed to get Etsy tokens. Status code {resp.status_code}. Description: {error_description}.'
             request.session['access_token'] = ''
             request.session['refresh_token'] = ''
             request.session['error'] = error
