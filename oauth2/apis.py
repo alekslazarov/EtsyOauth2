@@ -38,7 +38,7 @@ class EtsyOauth2API(ViewSet):
             'redirect_uri': f'{settings.BASE_URL}/oauth2/callback/',
             'code': code
         }
-        resp = requests.post(url, json=payload)
+        resp = requests.post(url, data=payload)
         if resp.status_code == 200:
             resp = resp.json()
             access_token = resp['access_token']
@@ -47,7 +47,7 @@ class EtsyOauth2API(ViewSet):
             request.session['refresh_token'] = refresh_token
             request.session['error'] = ''
         else:
-            error = f'Failed to get Etsy tokens. Status code {resp.status_code}'
+            error = f'Failed to get Etsy tokens. Status code {resp.status_code}. Content: {resp.content}'
             request.session['access_token'] = ''
             request.session['refresh_token'] = ''
             request.session['error'] = error
