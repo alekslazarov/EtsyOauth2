@@ -131,6 +131,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Etsy
 ETSY_API_KEY = env('ETSY_API_KEY', default='change-me')
 ETSY_API_SECRET = env('ETSY_API_SECRET', default='change-me')
+ETSY_STATE = env('ETSY_STATE', default='change-me')
 ETSY_PKCE = env('ETSY_PKCE', default='change-me')
 
 # Base URL
