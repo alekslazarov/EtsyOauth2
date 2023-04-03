@@ -31,7 +31,7 @@ class EtsyOauth2API(ViewSet):
 
     @action(detail=False, methods=['get'], url_path='callback', url_name='callback')
     def oauth2_callback(self, request):
-        code = request.query_params.get('code')
+        code = request.data.get('code')
         url = 'https://api.etsy.com/v3/public/oauth/token'
         payload = {
             'code': code,
@@ -53,7 +53,8 @@ class EtsyOauth2API(ViewSet):
                 error_description = resp.json()["error_description"]
             except:
                 error_description = 'Unknown Error'
-            error = f'Failed to get Etsy tokens. Status code {resp.status_code}. Description: {error_description}. One time code was {code}'
+            error = f'Failed to get Etsy tokens. Status code {resp.status_code}. Description: {error_description}. ' \
+                    f'One time code was {code}'
             request.session['access_token'] = ''
             request.session['refresh_token'] = ''
             request.session['error'] = error
