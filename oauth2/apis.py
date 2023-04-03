@@ -33,7 +33,7 @@ class EtsyOauth2API(ViewSet):
 
     @action(detail=False, methods=['get'], url_path='callback', url_name='callback')
     def oauth2_callback(self, request):
-        code = request.data.get('code')
+        code = request.query_params.get('code')
         url = 'https://api.etsy.com/v3/public/oauth/token'
         payload = {
             'code': code,
