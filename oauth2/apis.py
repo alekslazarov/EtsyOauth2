@@ -26,7 +26,8 @@ class EtsyOauth2API(ViewSet):
                      f'redirect_uri={redirect_uri}&' \
                      f'scope={" ".join(scopes)}&' \
                      f'state={settings.ETSY_STATE}&' \
-                     f'code_challenge={settings.ETSY_PKCE}'
+                     f'code_challenge={settings.ETSY_PKCE}&' \
+                     f'code_challenge_method=S256'
 
         return Response(oauth2_url, status=status.HTTP_200_OK)
 
