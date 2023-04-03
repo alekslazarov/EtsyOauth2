@@ -24,7 +24,8 @@ class EtsyOauth2API(ViewSet):
         oauth2_url = f'https://www.etsy.com/oauth/connect?response_type=code&' \
                      f'client_id={etsy_api_key}&' \
                      f'redirect_uri={redirect_uri}&' \
-                     f'scope={" ".join(scopes)}'
+                     f'scope={" ".join(scopes)}&' \
+                     f'code_challenge={settings.ETSY_PKCE}'
 
         return Response(oauth2_url, status=status.HTTP_200_OK)
 
@@ -33,10 +34,11 @@ class EtsyOauth2API(ViewSet):
         code = request.query_params.get('code')
         url = 'https://api.etsy.com/v3/public/oauth/token'
         payload = {
+            'code': code,
             'grant_type': 'authorization_code',
             'client_id': settings.ETSY_API_KEY,
             'redirect_uri': f'{settings.BASE_URL}/oauth2/callback/',
-            'code': code
+            'code_verifier': settings.ETSY_PKCE,
         }
         resp = requests.post(url, data=payload)
         if resp.status_code == 200:
@@ -47,7 +49,11 @@ class EtsyOauth2API(ViewSet):
             request.session['refresh_token'] = refresh_token
             request.session['error'] = ''
         else:
-            error = f'Failed to get Etsy tokens. Status code {resp.status_code}. Content: {resp.content}'
+            try:
+                error_description = resp.json()["error_description"]
+            except:
+                error_description = 'Unknown Error'
+            error = f'Failed to get Etsy tokens. Status code {resp.status_code}. Description: {error_description}. One time code was {code}'
             request.session['access_token'] = ''
             request.session['refresh_token'] = ''
             request.session['error'] = error
