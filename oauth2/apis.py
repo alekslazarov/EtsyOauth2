@@ -1,3 +1,4 @@
+import logging
 import hashlib
 import base64
 import requests
@@ -9,7 +10,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework.decorators import action
 
-from .serializers import GetEtsyOauth2UrlSerializer
+from .serializers import (
+    GetEtsyOauth2UrlSerializer,
+    CallEtsyAPISerializer,
+)
 
 
 class EtsyOauth2API(ViewSet):
@@ -69,3 +73,60 @@ class EtsyOauth2API(ViewSet):
         return redirect(
             reverse_lazy('oauth2-view')
         )
+
+    @action(detail=False, methods=['post'], url_path='call_api', url_name='call-api')
+    def call_etsy_api(self, request):
+        serializer = CallEtsyAPISerializer(data=request.data)
+        if not serializer.is_valid():
+            errors = serializer.errors
+            errors_ary = []
+            for field, error in errors.items():
+                errors_ary.append(error)
+
+            return Response(
+                {
+                    'status_code': 'None',
+                    'error': errors_ary[0]
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        method = serializer.validated_data['method']
+        url = serializer.validated_data['url']
+        payload = serializer.validated_data['payload']
+        access_token = serializer.validated_data['access_token']
+
+        resp = requests.request(
+            method=method,
+            url=url,
+            data=payload,
+            headers={
+                'x-api-key': settings.ETSY_API_KEY,
+                'Authorization': f'Bearer {access_token}'
+            }
+        )
+        if resp.status_code < 300:
+            try:
+                resp = {
+                    'status_code': resp.status_code,
+                    'result': resp.json()
+                }
+            except:
+                resp = {
+                    'status_code': resp.status_code,
+                    'result': ''
+                }
+            return Response(resp, status=status.HTTP_200_OK)
+
+        else:
+            try:
+                error = resp.json()["error_description"]
+            except Exception as e:
+                logging.error(e)
+                error = 'Unknown error'
+
+            resp = {
+                'status_code': resp.status_code,
+                'error': error
+            }
+            return Response(resp, status=status.HTTP_400_BAD_REQUEST)
