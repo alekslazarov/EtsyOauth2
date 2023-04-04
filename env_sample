@@ -5,7 +5,8 @@ DJ_ALLOWED_HOST=
 
 # Etsy
 ETSY_API_KEY=
-ETSY_API_SECRET=
+ETSY_PKCE=
+ETSY_STATE=
 
 # Base URL (Exclude the ending "\")
 BASE_URL=
