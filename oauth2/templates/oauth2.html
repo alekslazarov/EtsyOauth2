@@ -290,8 +290,7 @@
                     "access_token": access_token
                 }),
                 success: function(res) {
-                    console.log(res);
-                    const res_text = `Status code: ${res.status_code} \n ${res.result}}`;
+                    const res_text = `Status code: ${res.status_code} \n ${JSON.stringify(res.result)}}`;
                     $("#api_response").val(res_text);
                 },
                 error: function(err) {
