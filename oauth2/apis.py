@@ -114,7 +114,7 @@ class EtsyOauth2API(ViewSet):
             except:
                 resp = {
                     'status_code': resp.status_code,
-                    'result': ''
+                    'result': None
                 }
             return Response(resp, status=status.HTTP_200_OK)
 
