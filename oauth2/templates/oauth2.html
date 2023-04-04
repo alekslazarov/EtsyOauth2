@@ -39,7 +39,7 @@
             font-size: 28px;
         }
         .button {
-            width: 150px;
+            width: 210px;
             height: 40px;
         }
         .btn-grant-access {
@@ -192,6 +192,9 @@
                         <textarea id="refresh_token" class="token" readonly>{{ refresh_token }}</textarea>
                     </div>
                 </div>
+                <div>
+                    <button class="button btn-info" onclick="on_refresh_token();">Refresh Token</button>
+                </div>
             </div>
         </div>
         <div class="step">
@@ -256,6 +259,35 @@
                 },
                 error: function() {
                     alert("Failed to get Etsy authorization url");
+                }
+            });
+        }
+
+        function on_refresh_token() {
+            let refresh_token = $("#refresh_token").val()
+            if (refresh_token.length === 0) {
+                alert("Please do grant access first to get the Etsy access/refresh tokens");
+                return;
+            }
+
+            $.ajax({
+                headers: { "X-CSRFToken": "{{ csrf_token }}"},
+                url: "{% url 'oauth2-refresh-token' %}",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    "refresh_token": refresh_token
+                }),
+                success: function(res) {
+                    $("#access_token").val(res.access_token);
+                    $("#refresh_token").val(res.refresh_token);
+                    alert("Etsy tokens are refreshed");
+                },
+                error: function(err) {
+                    $("#access_token").val("");
+                    $("#refresh_token").val("");
+                    const resp = err.responseJSON;
+                    alert(`Failed to call Etsy api. Reason: ${resp.error}`);
                 }
             });
         }

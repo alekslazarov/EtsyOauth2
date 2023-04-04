@@ -12,6 +12,7 @@ from rest_framework.decorators import action
 
 from .serializers import (
     GetEtsyOauth2UrlSerializer,
+    RefreshEtsyTokenSerializer,
     CallEtsyAPISerializer,
 )
 
@@ -74,15 +75,48 @@ class EtsyOauth2API(ViewSet):
             reverse_lazy('oauth2-view')
         )
 
+    @action(detail=False, methods=['post'], url_path='refresh_token', url_name='refresh-token')
+    def refresh_token(self, request):
+        serializer = RefreshEtsyTokenSerializer(data=request.data)
+        if not serializer.is_valid():
+            errors_ary = [error for field, error in serializer.errors.items()]
+            return Response({'error': errors_ary[0]}, status=status.HTTP_400_BAD_REQUEST)
+
+        refresh_token = serializer.validated_data['refresh_token']
+        url = 'https://api.etsy.com/v3/public/oauth/token'
+        payload = {
+            'grant_type': 'refresh_token',
+            'client_id': settings.ETSY_API_KEY,
+            'refresh_token': refresh_token
+        }
+        resp = requests.post(url, data=payload)
+
+        if resp.status_code == 200:
+            resp = resp.json()
+            access_token = resp['access_token']
+            refresh_token = resp['refresh_token']
+            request.session['access_token'] = access_token
+            request.session['refresh_token'] = refresh_token
+
+            return Response({
+                'access_token': access_token,
+                'refresh_token': refresh_token
+            })
+
+        else:
+            request.session['access_token'] = ''
+            request.session['refresh_token'] = ''
+
+            return Response(
+                {'error': f'API call failed. Status code: {resp.status_code}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
     @action(detail=False, methods=['post'], url_path='call_api', url_name='call-api')
     def call_etsy_api(self, request):
         serializer = CallEtsyAPISerializer(data=request.data)
         if not serializer.is_valid():
-            errors = serializer.errors
-            errors_ary = []
-            for field, error in errors.items():
-                errors_ary.append(error)
-
+            errors_ary = [error for field, error in serializer.errors.items()]
             return Response(
                 {
                     'status_code': 'None',

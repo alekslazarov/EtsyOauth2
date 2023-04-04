@@ -36,6 +36,10 @@ class GetEtsyOauth2UrlSerializer(serializers.Serializer):
         return scopes
 
 
+class RefreshEtsyTokenSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField()
+
+
 class CallEtsyAPISerializer(serializers.Serializer):
     method = serializers.ChoiceField(choices=[
         'get',
