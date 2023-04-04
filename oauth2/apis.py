@@ -1,4 +1,5 @@
 import hashlib
+import base64
 import requests
 from django.conf import settings
 from django.shortcuts import redirect
@@ -21,12 +22,16 @@ class EtsyOauth2API(ViewSet):
 
         scopes = serializer.validated_data['scopes']
         etsy_api_key = settings.ETSY_API_KEY
+        pkce = settings.ETSY_PKCE
+        pkce_sha_256 = hashlib.sha256(pkce.encode('utf-8')).digest()
+        pkce_b64 = base64.urlsafe_b64encode(pkce_sha_256)
+        code_challenge = pkce_b64.decode('utf-8').replace('=', '')
         redirect_uri = f'{settings.BASE_URL}/oauth2/callback/'
         oauth2_url = f'https://www.etsy.com/oauth/connect?response_type=code&' \
                      f'client_id={etsy_api_key}&' \
                      f'redirect_uri={redirect_uri}&' \
                      f'scope={" ".join(scopes)}&' \
-                     f'state={settings.ETSY_STATE}&' \
+                     f'state={code_challenge}&' \
                      f'code_challenge={hashlib.sha256(settings.ETSY_PKCE.encode()).hexdigest()}&' \
                      f'code_challenge_method=S256'
 
