@@ -154,7 +154,13 @@ class EtsyOauth2API(ViewSet):
 
         else:
             try:
-                error = resp.json()["error_description"]
+                error = resp.json()
+                if 'error_description' in error:
+                    error = error['error_description']
+                elif 'error' in error:
+                    error = error['error']
+                else:
+                    error = 'Unknown error'
             except Exception as e:
                 logging.error(e)
                 error = 'Unknown error'
