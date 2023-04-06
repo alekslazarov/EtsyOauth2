@@ -26,7 +26,7 @@ sudo pip3 install -r requirements.txt
 ```
 sudo chmod 777 ./
 ```
-5. Write `.env` file in the project directory.
+5. Write `.env` file in the project directory. Make sure to give proper permission to the log path configured in the environment.
 6. Migrate database.
 ```
 python3 manage.py migrate
