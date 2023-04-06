@@ -135,9 +135,9 @@ class EtsyOauth2API(ViewSet):
         # print log
         request_id = random.randint(100, 999)  # this is for logging
         request_log = f'---------- Etsy API Request. Id: {request_id} ----------\n' \
-                       f'Method: {method}\n' \
-                       f'Url: {url}\n' \
-                       f'Payload: {payload}'
+                      f'Method: {method}\n' \
+                      f'Url: {url}\n' \
+                      f'Payload: {payload}'
         self.logger.info(request_log)
 
         resp = requests.request(
