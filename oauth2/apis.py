@@ -1,4 +1,5 @@
 import logging
+import random
 import hashlib
 import base64
 import requests
@@ -18,6 +19,7 @@ from .serializers import (
 
 
 class EtsyOauth2API(ViewSet):
+    logger = logging.getLogger('etsy')
 
     @action(detail=False, methods=['post'], url_path='auth_url', url_name='auth-url')
     def get_auth_url(self, request):
@@ -130,6 +132,13 @@ class EtsyOauth2API(ViewSet):
         payload = serializer.validated_data['payload']
         access_token = serializer.validated_data['access_token']
 
+        request_id = random.randint(100, 999)  # this is for logging
+        request_log = f'---------- Etsy API Request. Id: {request_id} ----------\n' \
+                       f'Method: {method}\n' \
+                       f'Url: {url}\n' \
+                       f'Payload: {payload}'
+        self.logger.info(request_log)
+
         resp = requests.request(
             method=method,
             url=url,
@@ -140,17 +149,21 @@ class EtsyOauth2API(ViewSet):
             }
         )
         if resp.status_code < 300:
+            response_log = f'---------- Etsy API Response. Id: {request_id} ----------\n' \
+                           f'Status: Success\n' \
+                           f'Code: {resp.status_code}'
+            self.logger.info(response_log)
             try:
-                resp = {
+                res = {
                     'status_code': resp.status_code,
                     'result': resp.json()
                 }
             except:
-                resp = {
+                res = {
                     'status_code': resp.status_code,
                     'result': None
                 }
-            return Response(resp, status=status.HTTP_200_OK)
+            return Response(res, status=status.HTTP_200_OK)
 
         else:
             try:
@@ -162,11 +175,18 @@ class EtsyOauth2API(ViewSet):
                 else:
                     error = 'Unknown error'
             except Exception as e:
-                logging.error(e)
+                self.logger.error('Unexpected error to get etsy api request error message. %s', e)
                 error = 'Unknown error'
 
-            resp = {
+            res = {
                 'status_code': resp.status_code,
                 'error': error
             }
-            return Response(resp, status=status.HTTP_400_BAD_REQUEST)
+
+            response_log = f'---------- Etsy API Response. Id: {request_id} ----------\n' \
+                           f'Status: Fail\n' \
+                           f'Code: {resp.status_code}\n' \
+                           f'Error: {error}'
+            self.logger.warning(response_log)
+
+            return Response(res, status=status.HTTP_400_BAD_REQUEST)

@@ -135,3 +135,49 @@ ETSY_PKCE = env('ETSY_PKCE', default='change-me')
 
 # Base URL
 BASE_URL = env('BASE_URL', default='change-me')
+
+# Logging
+LOG_PATH = env('LOG_PATH', default='change-me')
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '[{asctime}] {levelname}: {message}',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+            'style': '{',
+        },
+        'file': {
+            'format': '[{asctime}] {levelname}: {message}',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+            'style': '{',
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+            'level': 'INFO',
+        },
+        'etsy': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_PATH, 'etsy.log'),
+            'level': 'INFO',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'etsy': {
+            'handlers': ['etsy'],
+            'level': 'INFO',
+        },
+    },
+}

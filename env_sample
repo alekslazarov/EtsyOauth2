@@ -10,3 +10,6 @@ ETSY_STATE=
 
 # Base URL (Exclude the ending "\")
 BASE_URL=
+
+# Logging
+LOG_PATH=
