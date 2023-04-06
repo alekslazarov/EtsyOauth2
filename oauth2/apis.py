@@ -132,6 +132,7 @@ class EtsyOauth2API(ViewSet):
         payload = serializer.validated_data['payload']
         access_token = serializer.validated_data['access_token']
 
+        # print log
         request_id = random.randint(100, 999)  # this is for logging
         request_log = f'---------- Etsy API Request. Id: {request_id} ----------\n' \
                        f'Method: {method}\n' \
@@ -149,6 +150,7 @@ class EtsyOauth2API(ViewSet):
             }
         )
         if resp.status_code < 300:
+            # print log
             response_log = f'---------- Etsy API Response. Id: {request_id} ----------\n' \
                            f'Status: Success\n' \
                            f'Code: {resp.status_code}'
@@ -183,6 +185,7 @@ class EtsyOauth2API(ViewSet):
                 'error': error
             }
 
+            # print log
             response_log = f'---------- Etsy API Response. Id: {request_id} ----------\n' \
                            f'Status: Fail\n' \
                            f'Code: {resp.status_code}\n' \
